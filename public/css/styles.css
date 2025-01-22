@@ -1,0 +1,217 @@
+@font-face {
+    font-family: RobotoFlex;
+    src: url("../font/RobotoFlex.ttf");
+}
+
+:root {
+    --black: #000;
+    --white: #fff;
+    --forground: #333;
+    --background: #fff;
+    --light: #eeeeee;
+    --medium: #efefef;
+    --text-light: #767676;
+    --primary: #069ea2;
+    --secondary: #8f6ff5;
+    --text-h1: 42px;
+    --spacing-h1: -1px;
+    --text-small: 16px;
+    --text-link: 18px;
+    --btn-padding: 10px 40px;
+    --display-big: 280px;
+    --width: 1240px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: RobotoFlex;
+}
+.flex {
+    display: flex;
+}
+.between {
+    justify-content: space-between;
+}
+.justify-center {
+    justify-content: center;
+}
+.flex-col {
+    flex-direction: column;
+}
+.items-center {
+    align-items: center;
+}
+
+body {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 20px;
+}
+a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+ul {
+    list-style: none;
+}
+h1 {
+    font-size: var(--text-h1);
+    color: var(--forground);
+    letter-spacing: var(--spacing-h1);
+}
+p.small {
+    font-size: var(--text-small);
+}
+.muted {
+    color: var(--text-light);
+}
+.btn {
+    padding: var(--btn-padding);
+    background: linear-gradient(160deg, var(--primary), var(--secondary));
+    display: block;
+    color: var(--white);
+    font-size: var(--text-link);
+    border-radius: 10px;
+}
+nav {
+    margin: auto;
+    max-width: var(--width);
+    width: 100%;
+    margin-top: 33px;
+}
+nav ul {
+    list-style: none;
+    gap: 4.5rem;
+}
+
+section,
+footer {
+    max-width: var(--width);
+    width: 100%;
+    margin: auto;
+}
+.hero .content {
+    width: 100%;
+    display: flex;
+    width: 100%;
+}
+.hero .text {
+    max-width: 540px;
+    gap: 16px;
+    align-items: start;
+}
+.hero .cards {
+    max-width: var(--width);
+    align-items: center;
+}
+
+.features .cards {
+    gap: 40px;
+}
+.features p {
+    margin-top: 14px;
+}
+.features .card {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 32px;
+    gap: 18px;
+    padding: 50px;
+}
+
+.information div:nth-child(1) img {
+    max-width: 802px;
+    width: 100vw;
+}
+
+.information div:nth-child(2) img {
+    max-width: 384px;
+    width: 100vw;
+}
+.information .text {
+    max-width: 326px;
+    width: 100%;
+    gap: 14px;
+}
+.information .excellence {
+    align-items: end;
+    margin-bottom: 100px;
+    width: 100%;
+    justify-content: space-between;
+    position: relative;
+}
+.information .excellence::after {
+    content: "FIT FORGE";
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: var(--display-big);
+    z-index: -1;
+    clear: both;
+    display: inline-block;
+    white-space: nowrap;
+    text-align: center;
+    margin-top: 80px;
+    background: linear-gradient(var(--forground), #ffffff00);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    overflow-x: hidden;
+}
+
+.information .excellence .text {
+    margin-bottom: 100px;
+}
+.information div:nth-child(2) {
+    gap: 80px;
+}
+.information .text-first {
+    margin-top: -250px;
+}
+.information .text-second {
+    margin-top: 250px;
+}
+
+.about img {
+    max-width: 804px;
+    width: 100vw;
+}
+
+.about .content {
+    max-width: 280px;
+    width: 100%;
+    gap: 32px;
+    display: flex;
+    flex-direction: column;
+}
+.get-started {
+    max-width: 540px;
+    width: 100%;
+    text-align: center;
+    gap: 16px;
+}
+
+footer {
+    margin-top: 100px;
+}
+footer div:nth-child(1) {
+    max-width: 281px;
+    width: 100%;
+    gap: 30px;
+}
+footer div:nth-child(1) ul {
+    gap: 40px;
+}
+footer div:nth-child(2) {
+    max-width: 281px;
+    width: 100%;
+    gap: 30px;
+}
