@@ -1,12 +1,22 @@
-<div class="card">
+<div class="navgation flex between">
+    <div class="user flex">
+        <img src="{{ asset('./img/profile.png')}}" alt="user">
+        <div>
 
-    {{ $user->id }}
+            <h1> {{ $user->name}}</h1>
+            <form action="/{{$page}}/logout" method="post">
+                @csrf
+                @method('DELETE')
 
-    <form action="/trainer/logout" method="post">
-        @csrf
-        @method('DELETE')
+                <button> <img src="{{ asset('./img/logout.png') }}" alt="logout"> logout</button>
+        </div>
+        </form>
+    </div>
+    <div class="time">
+        <p>
+            {{ $timestamp->format('H:i') }}
+        </p>
 
-        <input type="submit" value="logout">
-    </form>
+    </div>
 
 </div>

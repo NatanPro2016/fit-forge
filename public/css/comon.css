@@ -1,0 +1,121 @@
+@font-face {
+    font-family: RobotoFlex;
+    src: url("../font/RobotoFlex.ttf");
+}
+
+:root {
+    --black: #000;
+    --white: #fff;
+    --forground: #333;
+    --background: #fff;
+    --light: #eeeeee;
+    --medium: #efefef;
+    --text-light: #767676;
+    --primary: #7796f2;
+    --secondary: #8f6ff5;
+    --danger: #ff0000;
+    --text-h1: 42px;
+    --spacing-h1: -1px;
+    --text-small: 16px;
+    --text-link: 18px;
+    --btn-padding: 10px 40px;
+    --display-big: 280px;
+    --width: 1240px;
+    --border: 1px solid #e2e4e5;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: RobotoFlex;
+}
+.flex {
+    display: flex;
+}
+.between {
+    justify-content: space-between;
+}
+.justify-center {
+    justify-content: center;
+}
+.flex-col {
+    flex-direction: column;
+}
+.items-center {
+    align-items: center;
+}
+
+body {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 20px;
+}
+a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+ul {
+    list-style: none;
+}
+h1 {
+    font-size: var(--text-h1);
+    color: var(--forground);
+    letter-spacing: var(--spacing-h1);
+}
+p.small {
+    font-size: var(--text-small);
+}
+.muted {
+    color: var(--text-light);
+}
+.btn {
+    padding: var(--btn-padding);
+    background: linear-gradient(160deg, var(--primary), var(--secondary));
+    display: block;
+    color: var(--white);
+    font-size: var(--text-link);
+    border-radius: 10px;
+}
+nav {
+    margin: auto;
+    max-width: var(--width);
+    width: 100%;
+    margin-top: 33px;
+    margin-bottom: unset;
+}
+nav ul {
+    list-style: none;
+    gap: 4.5rem;
+}
+nav .logo {
+    gap: 10px;
+}
+
+section,
+footer {
+    max-width: var(--width);
+    width: 100%;
+    margin: auto;
+}
+
+.error {
+    color: var(--danger);
+    font-size: 0.875rem;
+}
+.error-border {
+    border-color: var(--danger);
+}
+
+.error-message {
+    height: 40px;
+    width: 100%;
+    color: var(--danger);
+    background-color: #ff00003b;
+    align-items: center;
+    display: flex;
+    padding: 0 20px;
+}

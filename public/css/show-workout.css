@@ -1,0 +1,67 @@
+/* show-workout */
+.show-workout {
+    text-transform: capitalize;
+    .mute {
+        color: var(--text-light);
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+    #container {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        max-height: 45vh;
+        overflow-x: scroll;
+        mask: linear-gradient(#fff 70%, #000000a1);
+        .workout {
+            display: flex;
+            height: unset;
+            flex-direction: column;
+            padding-top: 10px;
+            gap: 20px;
+
+            .aligner {
+                display: flex;
+                width: 100%;
+                align-items: center;
+                gap: 16px;
+            }
+            .circle-container {
+                width: 100%;
+                display: flex;
+
+                margin-top: 10px;
+                gap: 10px;
+            }
+            .circle {
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                background-color: var(--light-background);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .circle.active {
+                background-color: var(--secondary);
+                color: var(--white);
+                font-size: 16px;
+            }
+        }
+    }
+    .add-more,
+    .finish {
+        max-width: 300px;
+        width: 100%;
+        text-align: center;
+        margin-block: 10px;
+        border: 1px solid var(--secondary);
+        color: var(--secondary);
+        border-radius: 8px;
+        padding: 13px;
+    }
+    .finish {
+        background-color: var(--secondary);
+        color: var(--white);
+    }
+}

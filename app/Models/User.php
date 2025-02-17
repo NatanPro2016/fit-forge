@@ -99,10 +99,16 @@ class User extends Authenticatable
     }
     public function userWorkouts()
     {
-        return $this->hasMany(UserWorkout::class);
+        return $this->hasMany(UserWorkout::class , 'user_id', 'id', );
     }
     public function customPlans()
     {
         return $this->hasMany(CustomPlans::class);
+    }
+
+    public function savedWorkouts()
+    {
+        return $this->belongsToMany(Workout::class, 'saved_workouts', 'user_id', 'workout_id')
+            ->withTimestamps(); // For `created_at` and `updated_at` in the pivot table.
     }
 }

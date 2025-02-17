@@ -1,57 +1,87 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.user')
+@section('title', 'Dashboard')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-</head>
-
-<body>
-    <form action="/users/logout" method="post">
-        @csrf
-        @method("DELETE")
-        <input type="submit" value="logout">
-    </form>
+@section('content')
 
 
-    @if (session('success'))
-        {{session('success')}}
 
-    @endif
+<div class="dashboard content">
+    <div class="progress">
+        <div class="flex flex-col">
 
+            <h1>
+                Your progress
+            </h1>
+            <p class="muted">
+                progress
+
+            </p>
+        </div>
+    </div>
+    <ul class="flex flex-col">
+        <li> <a href="/users/create-plan" class="flex items-center"> <img src="{{ asset('/img/add.png')}}" alt="add">
+                Create plan</a>
+        </li>
+        <li> <a href="/users/workouts" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add"
+                    class="gray">
+                discover workouts </a>
+        </li>
+        <li> <a href="/users/dicover-plans" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add"
+                    class="gray">
+                discover plans</a>
+        </li>
+        <li> <a href="/users/create-plan" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add"
+                    class="gray">
+                Create plan</a>
+        </li>
+        <li> <a href="/users/workouts" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add">
+                workouts</a>
+        </li>
+        <li> <a href="/users/my-progress" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add">
+                my progress</a>
+        </li>
+
+    </ul>
     @if (session('error'))
         {{session('error')}}
-
     @endif
 
-    <form action="/users/save-workout" method="post">
-        @csrf
-        <input type="number" placeholder="workout id" name="workout_id">
-        <input type="submit" value="save">
-    </form>
-    <h1> save plan </h1>
-    <form action="/users/save-plan" method="post">
+</div>
 
-        @csrf
-        <input type="number" placeholder="plan id" name="plan_id">
-        <input type="submit" value="save">
 
-    </form>
+@endsection
 
 
 
-    update user plan
 
-    <form action="/users/update-plan" method="post">
-        @csrf
-        <input type="number" placeholder="plan id" name='plan_id'>
-        <input type="number" placeholder="worked dates" name='worked_dates'>
-        <input type="number" placeholder="paued number" name='paued_number'>
-        <input type="submit" value="submit">
+<!-- 
 
 
-    </form>
-</body>
 
-</html>
+@if (session('success'))
+    {{session('success')}}
+
+@endif
+
+@if (session('error'))
+    {{session('error')}}
+
+@endif
+
+
+<h1> save plan </h1>
+
+
+
+
+update user plan
+
+<form action="/users/update-plan" method="post">
+    @csrf
+    <input type="number" placeholder="plan id" name='plan_id'>
+    <input type="number" placeholder="worked dates" name='worked_dates'>
+    <input type="number" placeholder="paued number" name='paued_number'>
+    <input type="submit" value="submit">
+
+
+</form>  -->

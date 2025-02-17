@@ -1,0 +1,228 @@
+.contaner {
+    margin: 0 auto;
+    max-width: 456px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 40px auto;
+}
+
+.contaner form {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    border: var(--border);
+    padding: 32px;
+    gap: 32px;
+    border-radius: 8px;
+}
+.form-container {
+    margin-top: 10px;
+    width: 100%;
+    max-width: 300px;
+    max-height: 40vh;
+    overflow: auto;
+
+    display: flex;
+    mask: linear-gradient(#fff 70%, #ffffff9f);
+}
+.center {
+    min-width: 240px !important;
+}
+
+form.create-plan {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 32px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 240px;
+}
+
+.input-terms-of-use {
+    margin: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    input {
+        height: 18px;
+        width: 18px;
+    }
+    input:checked {
+        background-color: var(--secondary);
+    }
+    a {
+        color: var(--secondary);
+        margin-left: 8px;
+    }
+}
+form .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+.input-group input,
+textarea,
+select {
+    border: none;
+    text-transform: capitalize;
+    border-bottom: var(--border);
+    width: 100%;
+    padding: 8px;
+    background-color: transparent;
+    &:focus {
+        outline: none;
+    }
+    &:active {
+        outline: none;
+    }
+}
+.input-group label {
+    text-transform: capitalize;
+    font-size: 14px;
+}
+input[type="submit"] {
+    padding: 12px 22px;
+    border: none;
+}
+
+button.create-plan {
+    width: 100%;
+    background: var(--secondary);
+    color: white;
+    border: none;
+    text-align: center;
+    height: 40px;
+    padding: auto 0;
+    border-radius: var(--gap-1);
+}
+
+.indecator {
+    width: 100% !important;
+    display: flex;
+    align-items: center;
+    margin-top: 30px;
+    gap: 10px;
+}
+.indecator .circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    background: var(--text-light);
+}
+
+.indecator .circle.active {
+    background: var(--secondary);
+}
+.indecator .line {
+    width: 40px;
+    height: 1px;
+    background: var(--text-light);
+}
+.indecator .line.active {
+    background: var(--secondary);
+}
+.plan-workout {
+    width: 100%;
+}
+.create-workout-plan {
+    
+    .days {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+
+        /* Style the label */
+        label {
+            height: 32px;
+            width: 32px;
+            background: var(--light-background);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        /* Change background color when checkbox is checked */
+        #Mon:checked + label[for="Mon"],
+        #Tues:checked + label[for="Tues"],
+        #Wed:checked + label[for="Wed"],
+        #Thurs:checked + label[for="Thurs"],
+        #Fri:checked + label[for="Fri"],
+        #Sat:checked + label[for="Sat"],
+        #Sun:checked + label[for="Sun"] {
+            background-color: var(--secondary);
+
+            color: var(--white);
+        }
+    }
+
+    /* Container for the input and buttons */
+    .number-input {
+        width: fit-content;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px; /* Space between buttons and input */
+    }
+
+    /* Style for the input box */
+    .number-input input[type="number"] {
+        width: 60px; /* Adjust width as needed */
+        padding: 10px;
+        font-size: 16px;
+        text-align: center;
+
+        border-radius: 9999px;
+        outline: none;
+    }
+
+    label.numbers {
+        margin-block: 10px;
+    }
+    /* Style for the buttons */
+    .number-input div {
+        margin-block: 10px;
+        height: 24px;
+        width: 24px;
+        border-radius: 999999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+
+        background-color: var(--light-background);
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    /* Hover effect for buttons */
+    .number-input div:hover {
+        background-color: #ddd;
+    }
+
+    /* Disable spin buttons in the input */
+    .number-input input[type="number"]::-webkit-inner-spin-button,
+    .number-input input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    .number-input input[type="number"] {
+        -moz-appearance: textfield;
+        border: none;
+        background: var(--light-background);
+        height: 34px;
+        width: 34px;
+    }
+}

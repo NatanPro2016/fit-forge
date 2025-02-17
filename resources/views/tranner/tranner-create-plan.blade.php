@@ -1,13 +1,211 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.tranner')
+@section('title', 'Dashboard')
+@section('header')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+<link rel="stylesheet" href="{{ asset('./css/form.css') }}">
+@endsection
+@section('content')
+<div class="dashboard content flex flex-col">
+    <h1 class="small">Create Yourown Plan</h1>
+    <p class="muted">Workouts</p>
 
-<body>
+
+    <div class="form-container">
+        @if (!request('id') && !session('success'))
+
+            <div class="center">
+                <form action="/trainer/create-plan" method="POST" class="create-plan">
+                    @if(session('success'))
+                        <div style="background-color: green; color: white; padding: 10px;">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    @if(session('error'))
+                        <div style="background-color: red; color: white; padding: 10px;">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+                    @csrf
+                    <div class="input-group">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" name="title" value="{{ old('title') }}" placeholder="Title" required>
+                        @error('title')<span>{{ $message }}</span>@enderror
+                    </div>
+                    <div class="input-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" required
+                            placeholder="Description">{{ old('description') }} </textarea>
+                        @error('description')<span>{{ $message }}</span>@enderror
+                    </div>
+                    <div class="input-group">
+                        <label for="duration">Duration</label>
+                        <input type="number" id="duration" name="duration" value="{{ old('duration') }}"
+                            placeholder="Duration" required>
+                        @error('duration')<span>{{ $message }}</span>@enderror
+                    </div>
+                    <div class="input-group">
+                        <label for="type">Type</label>
+                        <input type="text" id="type" name="type" value="{{ old('type') }}" required placeholder="Type">
+                        @error('type')<span>{{ $message }}</span>@enderror
+                    </div>
+                    <button type="submit" class="create-plan">Create Plan</in>
+                </form>
+            </div>
+        @else
+
+            <div class="plan-workout">
+
+
+                <div class="search">
+                    <input type="text" id="search-input" placeholder="Search">
+                    <button id="search-button">
+                        <img src="/img/search.png" alt="Search">
+                    </button>
+                </div>
+
+                <div id="workout-container" class="create-plan">
+
+                </div>
+                <div id="loading" style="display: none; text-align: center; margin: 20px;">
+                    <div class="spinner"></div>
+                    <p>Loading...</p>
+                </div>
+                <button id="load-more-workout" class="load-more" data-page="1" style="display: none;">Load More</button>
+
+            </div>
+
+
+
+            <script defer>
+                const loadMoreButton = document.getElementById("load-more-workout");
+                const dataContainer = document.getElementById("workout-container");
+                const searchInput = document.getElementById("search-input");
+                const searchButton = document.getElementById("search-button");
+                const loadingIndicator = document.getElementById("loading");
+
+                let currentSearchTerm = ""; // Store the current search term
+
+                async function fetchData(page = 1, search = "") {
+                    try {
+                        // Show loading indicator
+                        loadingIndicator.style.display = "block";
+
+                        const response = await fetch(`/trainer/get-workouts?page=${page}&search=${search}`);
+                        const result = await response.json();
+
+                        // Clear container if it's a new search
+                        if (page === 1) {
+                            dataContainer.innerHTML = ""; // Clear previous data
+                        }
+
+                        // Append new data to the container
+                        result.data.forEach(item => {
+                            const container = document.createElement("a");
+                            const info = document.createElement("div");
+                            const img = document.createElement("img");
+                            const heading = document.createElement("h1");
+                            const p = document.createElement("p");
+
+
+                            let plan_id = @json(session('plan_id')) || @json(request('id'))
+
+                            container.setAttribute('href', `/trainer/create-workout-plan?id=${item.id}&plan_id=${plan_id}`)
+
+                            info.classList.add("info");
+                            heading.innerText = item.title;
+                            p.innerText = item.description;
+
+                            img.src = `/storage/${item.image}`;
+                            img.alt = "Workout Image";
+
+                            info.appendChild(heading);
+                            info.appendChild(p);
+
+                            container.appendChild(img);
+                            container.appendChild(info);
+                            container.classList.add("workout");
+
+                            dataContainer.appendChild(container);
+                        });
+
+                        // Check if more pages exist
+                        if (page >= result.last_page) {
+                            loadMoreButton.style.display = "none"; // Hide the button
+                        } else {
+                            loadMoreButton.style.display = "block"; // Show the button
+                            loadMoreButton.dataset.page = parseInt(page) + 1; // Increment page
+                        }
+                    } catch (error) {
+                        console.error("Error fetching data:", error);
+                    } finally {
+                        // Hide loading indicator
+                        loadingIndicator.style.display = "none";
+                    }
+                }
+
+                // Load initial data
+                fetchData();
+
+                // Search functionality
+                searchButton.addEventListener("click", () => {
+                    currentSearchTerm = searchInput.value.trim();
+                    fetchData(1, currentSearchTerm); // Fetch data with search term starting from page 1
+                    loadMoreButton.dataset.page = 2; // Reset pagination
+                });
+
+                // Trigger search when pressing Enter in the search input
+                searchInput.addEventListener("keyup", (event) => {
+
+                    currentSearchTerm = searchInput.value.trim();
+                    fetchData(1, currentSearchTerm); // Fetch data with search term starting from page 1
+                    loadMoreButton.dataset.page = 2; // Reset pagination
+
+                });
+
+                // Load more data on button click
+                loadMoreButton.addEventListener("click", () => {
+                    const nextPage = loadMoreButton.dataset.page;
+                    fetchData(nextPage, currentSearchTerm); // Pass current search term to fetch
+                });
+            </script>
+
+
+
+
+        @endif
+
+
+    </div>
+
+
+    <div class="indecator">
+        <div class="circle active">
+        </div>
+        <div class="line active"></div>
+        <div class="circle">
+        </div>
+        <div class="line"></div>
+        <div class="circle">
+        </div>
+
+    </div>
+
+</div>
+
+@endsection
+
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+
 
     <div id="plan-container"></div>
     <button id="load-more-plan" data-page="1">Load More</button>
@@ -51,14 +249,12 @@
 
 
 
-    <!-- Success Message -->
     @if(session('success'))
         <div style="background-color: green; color: white; padding: 10px;">
             {{ session('success') }}
         </div>
     @endif
 
-    <!-- Error Message -->
     @if(session('error'))
         <div style="background-color: red; color: white; padding: 10px;">
             {{ session('error') }}
@@ -76,30 +272,30 @@
         <label for="incrimination">Incrimination</label>
         <input type="number" name="incrimination" required><br>
 
-        <label for="mon">Monday</label>
+        <label for="Mon">Monday</label>
         <input type="checkbox" name="mon"><br>
 
-        <label for="tues">Tuesday</label>
+        <label for="Tues">Tuesday</label>
         <input type="checkbox" name="tues"><br>
 
-        <label for="wed">Wednesday</label>
+        <label for="Wed">Wednesday</label>
         <input type="checkbox" name="wed"><br>
 
-        <label for="thurs">Thursday</label>
+        <label for="Thurs">Thursday</label>
         <input type="checkbox" name="thurs"><br>
 
 
-        <label for="fri">Friday</label>
+        <label for="Fri">Friday</label>
         <input type="checkbox" name="fri"><br>
         @error('fri')<span>{{ $message }}</span>@enderror
 
 
-        <label for="sat">Saturday</label>
+        <label for="Sat">Saturday</label>
         <input type="checkbox" name="sat"><br>
         @error('sat')<span>{{ $message }}</span>@enderror
 
 
-        <label for="sun">Sunday</label>
+        <label for="Sun">Sunday</label>
         <input type="checkbox" name="sun"><br>
         @error('sun')<span>{{ $message }}</span>@enderror
 
@@ -118,14 +314,14 @@
 
     <h2>Create Plan</h2>
 
-    <!-- Display success message -->
+  
     @if(session('success'))
         <div style="background-color: green; color: white; padding: 10px;">
             {{ session('success') }}
         </div>
     @endif
 
-    <!-- Form for creating a new plan -->
+  
     <form action="/trainer/create-plan" method="POST">
         @csrf
         <div>
@@ -200,4 +396,4 @@
 
 </body>
 
-</html>
+</html> -->

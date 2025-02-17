@@ -35,4 +35,10 @@ class Workout extends Model
         return $this->hasMany(UserWorkout::class);
     }
 
+    public function savedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'saved_workouts', 'workout_id', 'user_id')
+            ->withTimestamps();
+    }
+
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Plan;
 use App\Models\Tranner;
+use App\Models\TrannerWorkout;
 use App\Models\Workout;
 use App\Models\Workout_plan;
 use Illuminate\Http\Request;
@@ -77,12 +78,29 @@ class TrannerController extends Controller
 
         $fields['title'] = strip_tags($fields['title']);
         $fields['type'] = strip_tags($fields['target']);
-        $fields['video'] = strip_tags($fields['video']);
+        $fields['video'] = $this->convertToEmbedLinkIfNeeded(strip_tags($fields['video']));
         $fields['description'] = strip_tags($fields['description']);
         $fields['image'] = $request->file('image')->store('images', 'public');
         $fields['tranner_id'] = Auth::guard('tanner')->user()->id;
         Workout::create($fields);
         return back()->with('success', 'created successfully');
+    }
+    private function convertToEmbedLinkIfNeeded($url)
+    {
+        $parsedUrl = parse_url($url);
+
+        // Check if the host is YouTube
+        if (isset($parsedUrl['host']) && strpos($parsedUrl['host'], 'youtube.com') !== false) {
+            parse_str($parsedUrl['query'] ?? '', $queryParams);
+
+            // If it's a watch link with a `v` parameter, convert it
+            if (isset($queryParams['v'])) {
+                return "https://www.youtube.com/embed/" . $queryParams['v'];
+            }
+        }
+
+        // If already an embed link or not a YouTube link, return as is
+        return $url;
     }
 
     //workout plan related 
@@ -99,7 +117,7 @@ class TrannerController extends Controller
             'description' => 'required|string|min:5',
             'duration' => 'required|integer',
             'type' => 'required|string',
-            'count' => 'required|integer',
+
         ]);
 
         // Sanitize inputs (optional)
@@ -107,29 +125,36 @@ class TrannerController extends Controller
         $fields['description'] = strip_tags($fields['description']);
         $fields['type'] = strip_tags($fields['type']);
         $fields['tranner_id'] = Auth::guard('tanner')->user()->id;
+        $fields['count'] = 0;
+
+
 
 
 
         // Save data to the database
-        Plan::create($fields);
+        $plan = Plan::create($fields);
 
         // Redirect or return success message
-        return back()->with('success', 'Plan created successfully');
+        return back()->with(['success' => 'Plan created successfully', 'plan_id' => $plan->id]);
 
 
+    }
+    public function createWorkoutPlanView()
+    {
+        return view('tranner.tranner-create-workout-plan');
     }
     public function createWorkoutPlan(Request $request)
     {
         $fields = $request->validate([
             'duration' => ['required', 'integer'],
             'incrimination' => ['required', 'integer'],
-            'mon' => ['nullable'],
-            'tues' => ['nullable'],
-            'wed' => ['nullable'],
-            'thurs' => ['nullable'],
-            'fri' => ['nullable'],
-            'sat' => ['nullable'],
-            'sun' => ['nullable'],
+            'Mon' => ['nullable'],
+            'Tues' => ['nullable'],
+            'Wed' => ['nullable'],
+            'Thurs' => ['nullable'],
+            'Fri' => ['nullable'],
+            'Sat' => ['nullable'],
+            'Sun' => ['nullable'],
             'plan_id' => ['required', 'integer'],
             'workout_id' => ['required', 'integer'],
         ]);
@@ -141,13 +166,13 @@ class TrannerController extends Controller
         $fields['workout_id'] = strip_tags($fields['workout_id']);
 
         // For checkboxes, check if they're set. If not, set them to false.
-        $fields['mon'] = $request->has('mon') ? true : false;
-        $fields['tues'] = $request->has('tues') ? true : false;
-        $fields['wed'] = $request->has('wed') ? true : false;
-        $fields['thurs'] = $request->has('thurs') ? true : false;
-        $fields['fri'] = $request->has('fri') ? true : false;
-        $fields['sat'] = $request->has('sat') ? true : false;
-        $fields['sun'] = $request->has('sun') ? true : false;
+        $fields['Mon'] = $request->has('Mon') ? true : false;
+        $fields['Tues'] = $request->has('Tues') ? true : false;
+        $fields['Wed'] = $request->has('Wed') ? true : false;
+        $fields['Thurs'] = $request->has('Thurs') ? true : false;
+        $fields['Fri'] = $request->has('Fri') ? true : false;
+        $fields['Sat'] = $request->has('Sat') ? true : false;
+        $fields['Sun'] = $request->has('Sun') ? true : false;
 
         // Now you can create or update your model with the sanitized data
 
@@ -155,12 +180,42 @@ class TrannerController extends Controller
 
         Workout_plan::create($fields);
 
-        return redirect()->intended('/trainer/create-plan')->with('success', 'Plan created successfully');
+
+        return redirect()
+            ->intended('/trainer/show-workout-plan?id=' . $fields['plan_id'])
+            ->with(['success' => 'Plan created successfully']);
 
     }
-
-    public function getPlans(Request $request)
+    public function showWorkoutPlan()
     {
+        return view('tranner.tranner-show-workout-plan');
+
+    }
+    public function getWorkoutPlan(Request $request)
+    {
+        if ($id = $request->query('id')) {
+            $data = Workout_plan::
+                join('workouts', 'workout_plans.workout_id', '=', 'workouts.id')
+                ->where('workout_plans.plan_id', '=', $id);
+            return response()->json($data->paginate(5));
+
+        }
+    }
+    public function dicoverPlansView()
+    {
+        return view('tranner.tranner-discover-plan');
+    }
+    public function dicoverPlans(Request $request)
+    {
+        if ($id = $request->query('id')) {
+            $data = Plan::
+                join('workout_plans', 'plans.id', '=', 'workout_plans.plan_id')
+                ->join('workouts', 'workout_plans.workout_id', '=', 'workouts.id')
+                ->where('plans.id', '=', $id)
+                ->select('plans.*', 'workouts.*', 'workouts.title as workout_title', 'workouts.description as workout_description', 'workouts.type as workout_type');
+            return response()->json($data->paginate(5));
+
+        }
         $query = Plan::query();
 
         // Apply search
@@ -169,8 +224,8 @@ class TrannerController extends Controller
         }
 
         // Apply filters (e.g., category)
-        if ($category = $request->query('category')) {
-            $query->where('category', $category);
+        if ($type = $request->query('type')) {
+            $query->where('type', $type);
         }
 
         $data = $query->paginate(2);
@@ -182,31 +237,54 @@ class TrannerController extends Controller
             'total' => $data->total(),
             'per_page' => $data->perPage(),
         ]);
+
     }
     public function getWorkouts(Request $request)
     {
+        if ($workout_id = $request->query('id')) {
+            $data = Workout::where('id', '=', $workout_id);
+            return response()->json($data->get());
+
+        }
         $query = Workout::query();
 
         // Apply search
         if ($search = $request->query('search')) {
-            $query->where('name', 'like', "%$search%");
+            $query->where('title', 'like', "%$search%");
         }
 
         // Apply filters (e.g., category)
-        if ($category = $request->query('category')) {
-            $query->where('category', $category);
+        if ($type = $request->query('type')) {
+            $query->where('type', $type);
+        }
+        if ($request->query('saved')) {
+            $query->where('id', 'in', Auth::guard('tanner')->user()->id);
+
+            TrannerWorkout::where('tranner_id', Auth::guard('tanner')->user()->id);
         }
 
-        $data = $query->paginate(2);
 
-        return response()->json([
-            'data' => $data->items(),
-            'current_page' => $data->currentPage(),
-            'last_page' => $data->lastPage(),
-            'total' => $data->total(),
-            'per_page' => $data->perPage(),
-        ]);
+
+        if (empty($query->get()) || $query->count() == 0) {
+            return response()->json([
+                'data' => []
+            ]);
+        }
+
+        $data = $query->paginate(5);
+        $trannerId = Auth::guard('tanner')->user()->id;
+
+        $data->getCollection()->transform(function ($workout) use ($trannerId) {
+            $workout->is_aved = TrannerWorkout::
+                where('tranner_id', $trannerId)
+                ->where('workout_id', $workout->id)
+                ->exists();
+
+            return $workout;
+        });
+        return response()->json($data);
     }
+
 
     public function workouts(Request $request)
     {
@@ -224,6 +302,8 @@ class TrannerController extends Controller
         $fields = $request->validate(['workout_id' => ['requierd', 'integer']]);
         $data['workout_id'] = strip_tags($fields['workout_id']);
         $data['tranner_id'] = Auth::guard('tanner')->user()->id;
+
+        TrannerWorkout::create($data);
         return back()->with('success', 'saved');
 
     }

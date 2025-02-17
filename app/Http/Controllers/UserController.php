@@ -10,6 +10,8 @@ use App\Models\UserWorkout;
 use App\Models\Workout;
 use App\Models\Workout_plan;
 use App\Models\WorkoutCustomPlan;
+use DB;
+use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\User;
@@ -29,6 +31,13 @@ class UserController extends Controller
             'age' => ['required', 'integer'],
 
         ]);
+
+        $filds['name'] = strip_tags($request->input('name'));
+        $filds['email'] = strip_tags($request->input('email'));
+        $filds['username'] = strip_tags($request->input('username'));
+        $filds['password'] = strip_tags($request->input('password'));
+        $filds['age'] = strip_tags($request->input('age'));
+
         $filds['password'] = bcrypt($filds['password']);
         $user = User::create($filds);
         auth()->login($user);
@@ -73,55 +82,97 @@ class UserController extends Controller
 
     public function getWorkouts(Request $request)
     {
+
+        if ($workout_id = $request->query('id')) {
+            $data = Workout::where('id', '=', $workout_id);
+            return $data->get();
+
+        }
         $query = Workout::query();
 
         // Apply search
         if ($search = $request->query('search')) {
-            $query->where('name', 'like', "%$search%");
+            $query->where('title', 'like', "%$search%");
         }
 
         // Apply filters (e.g., category)
-        if ($category = $request->query('category')) {
-            $query->where('category', $category);
+        if ($request->has('type') && $request->type) {
+            $query->where('description', 'like', "%$search%");
         }
-        // if ($saved = $request->query('saved')) {
-        //     $query->where('id', );
-        // }
+        if ($request->has('saved') && $request->saved) {
+            $userId = auth()->id();
+            $query->
+                join('user_workouts', 'user_workouts.workout_id', 'workouts.id')
+                ->select('workouts.*', 'user_workouts.*', 'workouts.id as id')
+                ->where('user_workouts.user_id', $userId);
+        }
 
-        $data = $query->paginate(2);
 
-        return response()->json([
-            'data' => $data->items(),
-            'current_page' => $data->currentPage(),
-            'last_page' => $data->lastPage(),
-            'total' => $data->total(),
-            'per_page' => $data->perPage(),
-        ]);
+
+        if (empty($query->get()) || $query->count() == 0) {
+            return response()->json([
+                'data' => []
+            ]);
+        }
+
+        $data = $query->paginate(5);
+        $userId = auth()->id();
+
+        $data->getCollection()->transform(function ($workout) use ($userId) {
+            $workout->is_aved = UserWorkout::
+                where('user_id', $userId)
+                ->where('workout_id', $workout->id)
+                ->exists();
+
+            return $workout;
+        });
+        return response()->json($data);
     }
+
 
     public function workouts(Request $request)
     {
         if ($id = $request->query('id')) {
+            $user_id = auth()->id();
             $data = Workout::where('id', $id)->first();
-            return view('tranner.tranner-workouts', compact('data'));
+            $data['is_saved'] = UserWorkout::
+                where('user_id', '=', $user_id)
+                ->where('workout_id', '=', $data->id)
+                ->exists();
+
+
+            return view('user.user-workouts', compact('data'));
         }
         return view('user.user-workouts');
     }
 
+
     public function saveWorkout(Request $request)
     {
-        $data['workout_id'] = (int) strip_tags($request['workout_id']);
+        $data['workout_id'] = (int) strip_tags($request->input('workout_id'));
         $data['user_id'] = auth()->id();
-        $check = UserWorkout::where('user_id', '=', $data['user_id'])
-            ->where('workout_id', '=', $data['workout_id']);
 
-        if (!empty($check->get()) && $check->count() > 0) {
+        // Check if the workout already exists for the user
+        $check = UserWorkout::where('user_id', $data['user_id'])
+            ->where('workout_id', $data['workout_id']);
+
+        if ($check->exists()) {
+            // If the workout exists, delete it (toggle behavior)
             $check->delete();
-            return back()->with('success', 'ducument unsaved');
+            return response()->json([
+                'message' => 'Workout removed from favorites.',
+                'action' => 'removed'
+            ], 200); // 200 OK status
         }
+
+        // Otherwise, add the workout
         UserWorkout::create($data);
-        return back()->with('success', 'ducument saved');
+        return response()->json([
+            'message' => 'Workout added to favorites.',
+            'action' => 'added'
+        ], 200); // 200 OK status
     }
+
 
     public function dicoverPlansView()
     {
@@ -130,6 +181,30 @@ class UserController extends Controller
     }
     public function getDicoverPlans(Request $request)
     {
+
+
+        if ($id = $request->query('id')) {
+            $data = Plan::
+                join('workout_plans', 'plans.id', '=', 'workout_plans.plan_id')
+                ->join('workouts', 'workout_plans.workout_id', '=', 'workouts.id')
+                ->where('plans.id', '=', $id)
+                ->select('plans.*', 'workouts.*', 'plans.id as p_id', 'plans.title as p_title', 'plans.description as p_description', 'workouts.title as workout_title', 'workouts.description as workout_description', 'workouts.type as workout_type')
+                ->paginate(5);
+
+
+            $userId = auth()->id();
+
+
+            $data->getCollection()->transform(function ($plan) use ($userId) {
+                $plan->is_saved = User_plan::
+                    where('user_id', $userId)
+                    ->where('plan_id', $plan->id)->exists();
+                return $plan;
+            });
+
+            return response()->json($data);
+
+        }
         $query = Plan::query();
 
         // Apply search
@@ -138,8 +213,8 @@ class UserController extends Controller
         }
 
         // Apply filters (e.g., category)
-        if ($category = $request->query('category')) {
-            $query->where('category', $category);
+        if ($type = $request->query('type')) {
+            $query->where('type', $type);
         }
 
         $data = $query->paginate(2);
@@ -167,7 +242,7 @@ class UserController extends Controller
             'description' => 'required|string|min:5',
             'duration' => 'required|integer',
             'type' => 'required|string',
-            'count' => 'required|integer',
+
         ]);
 
         // Sanitize inputs (optional)
@@ -178,12 +253,20 @@ class UserController extends Controller
 
 
         // Save data to the database
-        CustomPlans::create($fields);
-        // return auth()->id();
+        $customPlan = CustomPlans::create($fields);
+
 
         // Redirect or return success message
-        return back()->with('success', 'Plan created successfully');
+        return back()->with(['success' => 'Plan created successfully', 'plan_id' => $customPlan->id]);
 
+    }
+    public function showWorkoutPlan()
+    {
+        return view('user.user-show-workout-plan');
+    }
+    public function createWorkoutPlanView()
+    {
+        return view('user.user-create-workout-plan');
     }
 
     public function createWorkoutPlan(Request $request)
@@ -209,22 +292,36 @@ class UserController extends Controller
         $fields['workout_id'] = (int) strip_tags($fields['workout_id']);
 
         // For checkboxes, check if they're set. If not, set them to false.
-        $fields['mon'] = $request->has('mon') ? true : false;
-        $fields['tues'] = $request->has('tues') ? true : false;
-        $fields['wed'] = $request->has('wed') ? true : false;
-        $fields['thurs'] = $request->has('thurs') ? true : false;
-        $fields['fri'] = $request->has('fri') ? true : false;
-        $fields['sat'] = $request->has('sat') ? true : false;
-        $fields['sun'] = $request->has('sun') ? true : false;
+        $fields['Mon '] = $request->has('mon') ? true : false;
+        $fields['Tues'] = $request->has('tues') ? true : false;
+        $fields['Wed'] = $request->has('wed') ? true : false;
+        $fields['Thurs'] = $request->has('thurs') ? true : false;
+        $fields['Fri'] = $request->has('fri') ? true : false;
+        $fields['Sat'] = $request->has('sat') ? true : false;
+        $fields['Sun'] = $request->has('sun') ? true : false;
 
         // Now you can create or update your model with the sanitized data
 
         // return $fields;
 
+
         WorkoutCustomPlan::create($fields);
 
-        return redirect()->intended('/users/create-plan')->with('success', 'Plan created successfully');
 
+        return redirect()
+            ->intended('/users/show-workout-plan?id=' . $fields['custom_plan_id'])
+            ->with(['success' => 'Plan created successfully']);
+
+    }
+    public function getWorkoutPlan(Request $request)
+    {
+        if ($id = $request->query('id')) {
+            $data = WorkoutCustomPlan::
+                join('workouts', 'workout_custom_plans.workout_id', '=', 'workouts.id')
+                ->where('workout_custom_plans.custom_plan_id', '=', $id);
+            return response()->json($data->paginate(5));
+
+        }
     }
 
     public function deletePlan(Request $request)
@@ -242,35 +339,40 @@ class UserController extends Controller
     }
     public function savePlan(Request $request)
     {
-        $data['plan_id'] = (int) strip_tags($request['plan_id']);
-        $data['user_id'] = auth()->id();
-        $check = User_plan::where('user_id', '=', $data['user_id'])
-            ->where('plan_id', '=', $data['plan_id']);
+        $req = $request->json()->all();
+
+        // Access specific fields
+        $plan_id = $req['plan_id'] ?? null;
+
+        $user_id = auth()->id();
+        $check = User_plan::where('user_id', '=', $user_id)
+            ->where('plan_id', '=', $plan_id);
+
+
 
         if (empty($check->get()) || $check->count() == 0) {
-            User_plan::create($data);
-            return back()->with('success', 'success');
+            return response()->json(User_plan::create(['user_id' => $user_id, 'plan_id' => $plan_id]));
 
         }
-        return back()->with('error', 'alrady added ');
+        return response()->json(['error', 'already saved']);
 
     }
     public function updatePlan(Request $request)
     {
         $data['plan_id'] = (int) strip_tags($request['plan_id']);
         $data['user_id'] = auth()->id();
-    
+
         $check = User_plan::where('user_id', '=', $data['user_id'])
             ->where('plan_id', '=', $data['plan_id']);
 
         if (!empty($check->get()) || $check->count() >= 0) {
-            if($request['worked_dates']){
-                $check->update(['worked_dates' => strip_tags($request['worked_dates'])] );
-                
+            if ($request['worked_dates']) {
+                $check->update(['worked_dates' => strip_tags($request['worked_dates'])]);
+
             }
-            if($request['paued_number']){
-                $check->update(['paued_number' => strip_tags($request['paued_number'])] );
-                
+            if ($request['paued_number']) {
+                $check->update(['paued_number' => strip_tags($request['paued_number'])]);
+
             }
 
             return back()->with('success', 'success');
@@ -282,14 +384,76 @@ class UserController extends Controller
     {
         return view('user.user-my-progress');
     }
-    public function myProgressApi()
+    public function getMyProgress(Request $request)
     {
+
+
+        if ($id = $request->query('id')) {
+            $query = Plan::
+                join('workout_plans', 'plans.id', '=', 'workout_plans.plan_id')
+                ->join('workouts', 'workout_plans.workout_id', '=', 'workouts.id')
+                ->join('user_plans', 'user_plans.plan_id', '=', 'plans.id')
+                ->where('user_plans.id', '=', $id)
+
+                ->select(
+                    'plans.*',
+                    'workouts.*',
+                    'user_plans.*',
+                    'workout_plans.*',
+                    'user_plans.id as u_p_user_plans_id',
+                    'plans.id as p_plan_id',
+                    'workout_plans.id as w_w_workout_plans_id',
+                    'workouts.id as w_workout_id',
+                    'user_plans.id as u_p_user_plan_id',
+                    'workouts.title as workout_title',
+                    'workouts.description as workout_description',
+                    'workouts.type as workout_type',
+                    'plans.title as plan_title',
+                    'plans.description as plan_description'
+                );
+
+            $paginated = $query->paginate(5);
+
+            // Add index manually
+            $indexedData = $paginated->getCollection()->map(function ($item, $index) use ($paginated) {
+                $item->row_index = ($paginated->currentPage() - 1) * $paginated->perPage() + $index + 1;
+                return $item;
+            });
+
+            // Replace the collection inside the paginator
+            $paginated->setCollection($indexedData);
+
+            return response()->json($paginated);
+        }
         $plans = Plan::join('user_plans', 'user_plans.plan_id', '=', 'plans.id')
             ->where('user_id', '=', auth()->id())
-            ->paginate(2);
-        return $plans;
+            ->select('*', 'user_plans.id as user_plan_id', )
+            ->paginate(5);
+        return response()->json($plans);
 
     }
+    public function updateProgress(Request $request)
+    {
+        $req = $request->json()->all();
+
+        // Access specific fields
+        $paued_number = $req['paued_number'] ?? null;
+        $user_plan_id = $req['user_plan_id'] ?? null;
+        if ($worked_dates = $req['worked_dates']) {
+            $data = User_plan::
+                where('user_id', auth()->id())
+                ->where('id', '=', $user_plan_id)
+                ->update(['paued_number' => 0, 'worked_dates' => $worked_dates]);
+            return response()->json($data);
+
+        }
 
 
+        $data = User_plan::
+            where('user_id', auth()->id())
+            ->where('id', '=', $user_plan_id)
+            ->update(['paued_number' => $paued_number]);
+
+        return response()->json($data);
+    }
 }

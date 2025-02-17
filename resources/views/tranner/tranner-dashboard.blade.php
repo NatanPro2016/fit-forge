@@ -1,21 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.tranner')
+@section('title', 'Dashboard')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tranner dashboard</title>
-</head>
+@section('content')
+<div class="dashboard content">
+    <div class="progress">
+        <div class="flex flex-col">
 
-<body>
-
-    <x-navigation :user="$user"></x-navigation>
-    <a href="/trainer/create-plan"> create plan</a>
-    <a href="/trainer/workouts"> workouts</a>
-    <a href="/trainer/create-workout"> create workout</a>
-    <a href="/trainer/get-plans"> plans</a>   
+            <h1>
+                Your progress
+            </h1>
+            <p class="muted">
 
 
-</body>
+            </p>
+        </div>
+    </div>
+    <ul class="flex flex-col">
+        <li> <a href="/trainer/create-plan" class="flex items-center"> <img src="{{ asset('/img/add.png')}}" alt="add">
+                Create plan</a>
+        </li>
+        <li> <a href="/trainer/workouts" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add"
+                    class="gray">
+                Discover workouts </a>
+        </li>
+        <li> <a href="/trainer/dicover-plans" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add"
+                    class="gray">
+                Discover plans</a>
+        </li>
+        <li> <a href="/trainer/create-workout" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}"
+                    alt="add" class="gray">
+                Create workouts</a>
+        </li>
+        <li> <a href="/trainer/workouts" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add"
+                    class="gray">
+                Discover Workouts</a>
+        </li>
 
-</html>
+
+    </ul>
+
+
+
+</div>
+
+
+
+
+
+@endsection
