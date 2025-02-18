@@ -243,7 +243,7 @@ class TrannerController extends Controller
     {
         if ($workout_id = $request->query('id')) {
             $data = Workout::where('id', '=', $workout_id);
-            return response()->json($data->get());
+            return $data->get();
 
         }
         $query = Workout::query();
@@ -254,13 +254,15 @@ class TrannerController extends Controller
         }
 
         // Apply filters (e.g., category)
-        if ($type = $request->query('type')) {
-            $query->where('type', $type);
+        if ($request->has('type') && $request->type) {
+            $query->where('description', 'like', "%$search%");
         }
-        if ($request->query('saved')) {
-            $query->where('id', 'in', Auth::guard('tanner')->user()->id);
-
-            TrannerWorkout::where('tranner_id', Auth::guard('tanner')->user()->id);
+        if ($request->has('saved') && $request->saved) {
+            $trannerId = Auth::guard('tanner')->user()->id;
+            $query->
+                join('tranner_workouts', 'tranner_workouts.workout_id', 'workouts.id')
+                ->select('workouts.*', 'tranner_workouts.*', 'workouts.id as id')
+                ->where('tranner_workouts.user_id', $trannerId);
         }
 
 
@@ -299,12 +301,28 @@ class TrannerController extends Controller
 
     public function saveWorkout(Request $request)
     {
-        $fields = $request->validate(['workout_id' => ['requierd', 'integer']]);
-        $data['workout_id'] = strip_tags($fields['workout_id']);
-        $data['tranner_id'] = Auth::guard('tanner')->user()->id;
+        $data['workout_id'] = (int) strip_tags($request->input('workout_id'));
+        $data['tranner_id'] =  Auth::guard('tanner')->user()->id;
 
+        // Check if the workout already exists for the user
+        $check = TrannerWorkout::where('tranner_id', $data['tranner_id'])
+            ->where('workout_id', $data['workout_id']);
+
+        if ($check->exists()) {
+            // If the workout exists, delete it (toggle behavior)
+            $check->delete();
+            return response()->json([
+                'message' => 'Workout removed from favorites.',
+                'action' => 'removed'
+            ], 200); // 200 OK status
+        }
+
+        // Otherwise, add the workout
         TrannerWorkout::create($data);
-        return back()->with('success', 'saved');
+        return response()->json([
+            'message' => 'Workout added to favorites.',
+            'action' => 'added'
+        ], 200); // 200 OK status
 
     }
 

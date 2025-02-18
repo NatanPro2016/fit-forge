@@ -24,6 +24,9 @@
     --border: 1px solid #e2e4e5;
 }
 
+input {
+    text-transform: unset !important;
+}
 * {
     margin: 0;
     padding: 0;
@@ -118,4 +121,9 @@ footer {
     align-items: center;
     display: flex;
     padding: 0 20px;
+}
+.admin {
+    width: 100%;
+    max-width: var(--width);
+    gap: 40px;
 }

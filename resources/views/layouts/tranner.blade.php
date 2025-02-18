@@ -20,8 +20,11 @@
 
         <x-navigation :user="Auth::guard('tanner')->user()" :page="$page" ></x-navigation>
         <div class="col"> 
+        <div class="flex flex-col content-holder">
+            
           
                 @yield('content')        
+                </div>
          
             <div class="image">
                 <img src="{{ asset('./img/trainer.png') }}" alt="">

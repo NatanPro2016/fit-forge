@@ -40,7 +40,7 @@ class UserController extends Controller
 
         $filds['password'] = bcrypt($filds['password']);
         $user = User::create($filds);
-        auth()->login($user);
+
         return redirect('/users/dashboard');
 
 
@@ -191,7 +191,6 @@ class UserController extends Controller
                 ->select('plans.*', 'workouts.*', 'plans.id as p_id', 'plans.title as p_title', 'plans.description as p_description', 'workouts.title as workout_title', 'workouts.description as workout_description', 'workouts.type as workout_type')
                 ->paginate(5);
 
-
             $userId = auth()->id();
 
 
@@ -217,7 +216,7 @@ class UserController extends Controller
             $query->where('type', $type);
         }
 
-        $data = $query->paginate(2);
+        $data = $query->paginate(5);
 
         return response()->json([
             'data' => $data->items(),

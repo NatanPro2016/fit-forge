@@ -72,15 +72,6 @@ Route::post('/user/add-message', [UserController::class, 'createChat'])->middlew
 
 
 
-// admin related
-//admin auth
-
-Route::get('/admin/login', [AdminController::class, 'login'])->middleware('logedout');
-Route::post('/admin/login', [AdminController::class, 'loginPost'])->middleware('logedout');
-
-Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->middleware('admin');
-Route::delete('/admin/logout', [AdminController::class, 'logout'])->middleware('admin');
-
 
 
 // tranner related 
@@ -113,12 +104,25 @@ Route::post('/trainer/create-workout-plan', [TrannerController::class, 'createWo
 Route::get('/trainer/create-workout-plan', [TrannerController::class, 'createWorkoutPlanView'])->middleware('trainer');
 Route::get('/trainer/show-workout-plan', [TrannerController::class, 'showWorkoutPlan'])->middleware('trainer');
 Route::get('/trainer/get-workout-plan', [TrannerController::class, 'getWorkoutPlan'])->middleware('trainer');
+Route::post('/trainer/save-workout', [TrannerController::class, 'saveWorkout'])->middleware('trainer');
+
+
+// admin related
+//admin auth
+
+Route::get('/admin/login', [AdminController::class, 'login'])->middleware('logedout');
+Route::post('/admin/login', [AdminController::class, 'loginPost'])->middleware('logedout');
+
+Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->middleware('admin');
+Route::delete('/admin/logout', [AdminController::class, 'logout'])->middleware('admin');
+
+Route::post('/admin/create-admin', [AdminController::class, 'createAdmin'])->middleware('admin');
+Route::post('/admin/create-trainer', [AdminController::class, 'createTranner'])->middleware('admin');
 
 
 
 
 
-// apis 
 
 
 

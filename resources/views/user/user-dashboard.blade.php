@@ -5,48 +5,46 @@
 
 
 
-<div class="dashboard content">
-    <div class="progress">
-        <div class="flex flex-col">
+    <div class="dashboard content">
+        <div class="progress">
+            <div class="flex flex-col">
 
-            <h1>
-                Your progress
-            </h1>
-            <p class="muted">
-                progress
+                <h1>
+                    welcome back
+                </h1>
+                <p class="muted">
+                    progress
 
-            </p>
+                </p>
+            </div>
         </div>
+        <ul class="flex flex-col">
+            <li> <a href="/users/create-plan" class="flex items-center"> <img src="{{ asset('/img/add.png')}}" alt="add">
+                    Create plan</a>
+            </li>
+            <li> <a href="/users/workouts" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add"
+                        class="gray">
+                    discover workouts </a>
+            </li>
+            <li> <a href="/users/dicover-plans" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add"
+                        class="gray">
+                    discover plans</a>
+            </li>
+            <li> <a href="/users/create-plan" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add"
+                        class="gray">
+                    Create plan</a>
+            </li>
+
+            <li> <a href="/users/my-progress" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add">
+                    my progress</a>
+            </li>
+
+        </ul>
+        @if (session('error'))
+            {{session('error')}}
+        @endif
+
     </div>
-    <ul class="flex flex-col">
-        <li> <a href="/users/create-plan" class="flex items-center"> <img src="{{ asset('/img/add.png')}}" alt="add">
-                Create plan</a>
-        </li>
-        <li> <a href="/users/workouts" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add"
-                    class="gray">
-                discover workouts </a>
-        </li>
-        <li> <a href="/users/dicover-plans" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add"
-                    class="gray">
-                discover plans</a>
-        </li>
-        <li> <a href="/users/create-plan" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add"
-                    class="gray">
-                Create plan</a>
-        </li>
-        <li> <a href="/users/workouts" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add">
-                workouts</a>
-        </li>
-        <li> <a href="/users/my-progress" class="flex items-center"> <img src="{{ asset('/img/pin.png')}}" alt="add">
-                my progress</a>
-        </li>
-
-    </ul>
-    @if (session('error'))
-        {{session('error')}}
-    @endif
-
-</div>
 
 
 @endsection

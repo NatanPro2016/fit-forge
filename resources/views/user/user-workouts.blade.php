@@ -1,6 +1,8 @@
 @extends('layouts.user')
 @section('title', 'Dashboard')
 @section('header')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+
     <link rel="stylesheet" href="{{ asset('./css/form.css') }}">
 @endsection
 
@@ -54,12 +56,23 @@
                             body: JSON.stringify({ workout_id: id }),
                         });
 
-                        const result = await response.json();
-                        alert(result.message);
+                        response.json().then((result) => {
+                            saveIcon.src = result.message.includes('removed') ? "{{asset('/img/save.png')}}" : "{{asset('/img/saved.png')}}";
+                            Swal.fire({
+                                title: 'Congratulations!',
+                                text: result.message.includes('removed') ? "Successfully remove the workout!" : "Workout saved !",
+                                icon: 'success',
+                                confirmButtonText: 'Great!'
+                            }).then((result) => {
+                                console.log('finised');
+
+                            })
+                        })
+
 
                         // Update button text and state
 
-                        saveIcon.src = result.message.includes('removed') ? "{{asset('/img/save.png')}}" : "{{asset('/img/saved.png')}}"
+
 
 
                     } catch (error) {

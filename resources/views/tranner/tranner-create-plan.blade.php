@@ -113,7 +113,7 @@
 
                             info.classList.add("info");
                             heading.innerText = item.title;
-                            p.innerText = item.description;
+                            p.innerText = `${item.description.substring(0, 30)} ${item.description.length >= 30 ? '...' : ''}`
 
                             img.src = `/storage/${item.image}`;
                             img.alt = "Workout Image";

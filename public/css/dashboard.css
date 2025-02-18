@@ -304,6 +304,8 @@ footer {
     gap: 20px;
     mask: linear-gradient(#fff 70%, #000000a1);
     margin-top: 20px;
+    max-height: 40vh;
+    overflow: auto;
 }
 
 .workout-big {
@@ -421,14 +423,35 @@ select {
 
 #plan-container {
     margin-top: 15px;
-    max-height: 60vh;
+    max-height: 40vh;
     overflow-x: scroll;
     display: flex;
     flex-direction: column;
     gap: 24px;
     .info {
         text-transform: capitalize;
+
+        img {
+            cursor: pointer;
+        }
     }
+}
+#plan-container.id {
+    max-height: 55vh;
+    .info {
+        display: flex;
+        align-items: center;
+    }
+}
+.add-plan {
+    max-width: 300px;
+    width: 100%;
+    text-align: center;
+    margin-block: 10px;
+    border: 1px solid var(--secondary);
+    color: var(--secondary);
+    border-radius: 8px;
+    padding: 13px;
 }
 .plan {
     border: var(--border);
@@ -483,4 +506,3 @@ select {
         }
     }
 }
-

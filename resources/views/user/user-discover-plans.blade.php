@@ -1,5 +1,6 @@
 @extends('layouts.user')
 @section('title', 'Dashboard')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 @section('content')
@@ -12,14 +13,12 @@
             <!-- Loading Indicator -->
 
 
-            <div id="plan-container"></div>
+            <div id="plan-container" class="id"></div>
             <div id="loading" style="display: none; text-align: center; margin: 20px;">
                 <div class="spinner"></div>
                 <p>Loading...</p>
             </div>
             <button id="load-more-plan" class="load-more" data-page="1" style="display: none;">Load More</button>
-
-
 
         </div>
 
@@ -53,7 +52,7 @@
                             const heading = document.createElement("h1");
                             const p = document.createElement("p");
                             const info_contaner = document.createElement("div");
-                            const save_button = document.createElement('button')
+                            const save_button = document.createElement('img')
                             info.classList.add("info");
                             info.classList.add("flex")
                             heading.innerText = item.p_title;
@@ -67,7 +66,7 @@
                             container.appendChild(info);
 
 
-                            save_button.innerText = 'save'
+                            save_button.src = "{{asset('/img/save.png')}}"
                             save_button.addEventListener('click', async () => {
                                 try {
 
@@ -79,6 +78,15 @@
 
                                     },)
                                     const result = await response.json();
+                                    Swal.fire({
+                                        title: result[0].includes('error') ? "Sorry" : "Congratulations!",
+                                        text: result[0].includes('error') ? "plan is alrady saved!" : "plan saved !",
+                                        icon: result[0].includes('error') ? "error" : "success",
+                                        confirmButtonText: 'Great!'
+                                    }).then((result) => {
+                                        console.log('finised');
+
+                                    })
                                     console.log("Success:", result);
                                 }
                                 catch (e) {
@@ -161,7 +169,7 @@
 
     @else
         <div class="dashboard content">
-            <h1>Discover Exercise</h1>
+            <h1>Discover plans</h1>
             <p class="muted">Plan</p>
 
             <div class="search">
@@ -188,7 +196,7 @@
                 <p>Loading...</p>
             </div>
             <button id="load-more-plan" class="load-more" data-page="1" style="display: none;">Load More</button>
-            <a href="/users/create-plan">add plan</a>
+            <a href="/users/create-plan" class="add-plan">add plan</a>
 
 
 

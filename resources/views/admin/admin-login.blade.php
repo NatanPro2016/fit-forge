@@ -5,15 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin login</title>
+    <meta name="description" content="Login to ajuster">
+    <link rel="stylesheet" href="{{ asset('./css/form.css') }}">
+    <link rel="stylesheet" href="{{ asset('./css/comon.css') }}">
+
+    <link rel="icon" href="{{ asset('./img/logo.png') }}">
+    <script src="{{ asset('./js/inputvaldation.js') }}" defer></script>
 </head>
 
 <body>
-    <form action="/admin/login" method="post">
-        @csrf
-        <input type="email" placeholder="email" name="email">
-        <input type="password" placeholder="password" name="password">
-        <input type="submit" value="login">
-    </form>
+    <nav class="flex between items-center">
+        <a class="logo flex items-center" href="/">
+            <img src="{{ asset('./img/logo.png') }}" alt="logo" />
+            Ajuster
+        </a>
+        <a href="/users/login">login as user</a>
+    </nav>
+    <div class="contaner">
+        <h1> Admin Login</h1>
+        <form action="/admin/login" method="post">
+            @csrf
+
+            <div class="input-group">
+                <label for="email"> email</label>
+                <input type="email" placeholder="email" name="email" id="email">
+            </div>
+            <div class="input-group">
+                <label for="password"> password</label>
+
+                <input type="password" placeholder="password" name="password" id="password">
+            </div>
+            <input type="submit" value="login" class="btn">
+        </form>
+
+    </div>
+
 
 </body>
 

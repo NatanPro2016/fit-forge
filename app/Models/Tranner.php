@@ -16,6 +16,7 @@ class Tranner extends Authenticatable
         'profilehash',
         'height',
         'weight',
+        'password'
     ];
     protected $hidden = [
         'password'
@@ -42,7 +43,7 @@ class Tranner extends Authenticatable
     {
         return $this->hasMany(TrannerWorkout::class);
     }
- 
+
 
     protected $guarded = [];
 
