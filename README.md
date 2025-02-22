@@ -19,4 +19,4 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 <img src="./Screenshot from 2025-02-18 09-03-17.png" />
 
 
-Laravel project from you firend Me
+Laravel project from you're friend Me
